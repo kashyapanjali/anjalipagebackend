@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const adminAuth = require('../middleware/authMiddleware');
+const upload = require('../middleware/upload');
 const {
-    getUserProfile,
     updateProfilePic,
     addProject,
     updateSkills,
     addCertificate
 } = require('../controllers/userController');
 
-router.get('/:id', getUserProfile);
-router.put('/:id/profile-pic', updateProfilePic);
+// Make sure only admin can update profile
+router.put('/admin/profile-pic', adminAuth, upload.single('profilePic'), updateProfilePic);
 router.post('/:id/projects', addProject);
 router.put('/:id/skills', updateSkills);
 router.post('/:id/certificates', addCertificate);
