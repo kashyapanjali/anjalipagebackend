@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
 				type: String,
 				enum: ["Ongoing", "completed"],
 				required: true,
-			}, 
+			}, // Type of certificate
 			title: { type: String, required: true }, // e.g., "Docify"
 			link: { type: String, required: false },
 			description: { type: String, required: true }, // Details about the project

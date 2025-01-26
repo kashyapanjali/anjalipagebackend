@@ -82,6 +82,39 @@ const addCompletedProject = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+// Add Ongoing Project
+const addOngoingProject = async (req, res) => {
+    try {
+        let user = await User.findOne();
+        if (!user) {
+            user = new User();
+        }
+
+        const newProject = {
+            category: "Ongoing",
+            title: req.body.title,
+            link: req.body.link,
+            description: req.body.description
+        };
+
+        // Check if project already exists in ongoing projects
+        const existingProject = user.projects.find(project => project.title === req.body.title && project.category === "Ongoing");
+        if (existingProject) {
+            return res.status(400).json({ message: "Ongoing project with this title already exists." });
+        }
+
+        user.projects.push(newProject);
+        await user.save();
+
+        res.status(201).json({
+            message: 'Ongoing project added successfully',
+            user
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
 
 // Add/Update ongoing project
 const updateOngoingProject = async (req, res) => {
@@ -144,19 +177,6 @@ const getProjects = async (req, res) => {
     }
 };
 
-// Update skills
-// const updateSkills = async (req, res) => {
-//     try {
-//         const user = await User.findByIdAndUpdate(
-//             req.params.id,
-//             { skills: req.body },
-//             { new: true }
-//         );
-//         res.json(user);
-//     } catch (error) {
-//         res.status(400).json({ message: error.message });
-//     }
-// };
 
 // Add certificate
 const addCertificate = async (req, res) => {
@@ -237,6 +257,7 @@ module.exports = {
     getProfile,
     updateProfilePic,
     addCompletedProject,
+    addOngoingProject,
     updateOngoingProject,
     getProjects,
     addCertificate,
