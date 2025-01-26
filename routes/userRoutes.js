@@ -19,11 +19,13 @@ router.put('/admin/profile-pic', adminAuth, upload.single('profilePic'), updateP
 
 // router.post('/:id/certificates', addCertificate);
 
-// All routes are admin-protected
-router.get('/admin/projects', adminAuth, getProjects);
-router.post('/admin/projects/completed', adminAuth, addCompletedProject);
-router.post('/admin/projects/ongoing', adminAuth, addOngoingProject);
-router.put('/admin/projects/ongoing:id', adminAuth, updateOngoingProject);  // Update ongoing project
+// Admin-protected project routes
+router.get('/admin/projects', adminAuth, getProjects); 
+// Get all projects
+router.post('/admin/projects/completed', adminAuth, addCompletedProject); // Add completed project
+router.post('/admin/projects/ongoing', adminAuth, addOngoingProject); // Add ongoing project
+router.put('/admin/projects/ongoing/:id', adminAuth, updateOngoingProject); // Update ongoing project
+
 
 // Admin route for adding skills
 router.post('/admin/skills', adminAuth, addSkills);

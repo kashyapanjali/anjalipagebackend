@@ -55,10 +55,12 @@ const updateProfilePic = async (req, res) => {
     }
 };
 
-// Add completed project
+
+// Add completed project (admin protected)
 const addCompletedProject = async (req, res) => {
     try {
-        let user = await User.findOne();
+        // Assuming adminAuth middleware verifies if the user is an admin
+        let user = await User.findOne();  // Admin should be able to access all users
         if (!user) {
             user = new User();
         }
@@ -82,10 +84,12 @@ const addCompletedProject = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
-// Add Ongoing Project
+
+// Add ongoing project (admin protected)
 const addOngoingProject = async (req, res) => {
     try {
-        let user = await User.findOne();
+        // Assuming adminAuth middleware checks the admin status
+        let user = await User.findOne();  // Admin should be able to access all users
         if (!user) {
             user = new User();
         }
@@ -97,7 +101,7 @@ const addOngoingProject = async (req, res) => {
             description: req.body.description
         };
 
-        // Check if project already exists in ongoing projects
+        // Check if the project already exists in ongoing category
         const existingProject = user.projects.find(project => project.title === req.body.title && project.category === "Ongoing");
         if (existingProject) {
             return res.status(400).json({ message: "Ongoing project with this title already exists." });
@@ -115,10 +119,10 @@ const addOngoingProject = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
-
-// Add/Update ongoing project
+// Update ongoing project (admin protected)
 const updateOngoingProject = async (req, res) => {
     try {
+        // Assuming adminAuth middleware checks the admin status
         let user = await User.findOne();
         if (!user) {
             user = new User();
@@ -131,6 +135,7 @@ const updateOngoingProject = async (req, res) => {
             description: req.body.description
         };
 
+        // Find the project in ongoing category
         const existingProjectIndex = user.projects.findIndex(
             project => project.title === req.body.title && project.category === "Ongoing"
         );
@@ -158,25 +163,16 @@ const updateOngoingProject = async (req, res) => {
 // Get all projects
 const getProjects = async (req, res) => {
     try {
-        const user = await User.findOne();
-        if (!user) {
-            return res.status(404).json({ message: 'No projects found' });
-        }
-
-        const category = req.query.category;
-        let projects = user.projects;
-        
-        if (category) {
-            projects = projects.filter(project => project.category === category);
-        }
-
-        res.json(projects);
+      // Fetch all projects from the database (modify as per your DB model)
+      const ongoingProjects = await Project.find({ category: 'Ongoing' });
+      const completedProjects = await Project.find({ category: 'Completed' });
+      res.json([...ongoingProjects, ...completedProjects]);  // Merge ongoing and completed projects
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: error.message });
+      console.error("Error fetching projects:", error);
+      res.status(500).json({ message: "Server error" });
     }
-};
-
+  };
+  
 
 // Add certificate
 const addCertificate = async (req, res) => {

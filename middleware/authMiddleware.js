@@ -1,12 +1,12 @@
 const adminAuth = (req, res, next) => {
-    const adminKey = req.headers['admin-key'];
+    const adminKey = req.headers["admin-key"];  // Access the admin key from the headers
     
-    // Your personal secret key
-    if (adminKey === process.env.ADMIN_SECRET) {
-        next();
-    } else {
-        res.status(401).json({ message: 'Unauthorized access' });
+    if (!adminKey || adminKey !== process.env.ADMIN_SECRET) {  // Check against your secret key
+      return res.status(401).json({ message: "Unauthorized access" });
     }
-};
-
-module.exports = adminAuth; 
+  
+    next();  // If key matches, proceed to the next middleware or route handler
+  };
+  
+  module.exports = adminAuth;
+  
