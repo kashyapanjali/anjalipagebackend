@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('../models/User');
 
 const connectDB = async () => {
     try {
@@ -11,3 +12,4 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
