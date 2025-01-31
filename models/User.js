@@ -12,7 +12,8 @@ const UserSchema = new mongoose.Schema({
 		frontend: { type: [String], required: true }, 
 		backend: { type: [String], required: true }, 
 		database: { type: [String], required: true }, 
-		tools: { type: [String], required: true }, 
+		tools: { type: [String], required: true },
+		others:{type: [String], required: true} //how to add this?
 	},
 
 	certificates: [

@@ -110,7 +110,7 @@ const addSkills = async (req, res) => {
 
     const { category, skills } = req.body;
 
-    if (!["frontend", "backend", "database", "tools"].includes(category)) {
+    if (!["frontend", "backend", "database", "tools", "others"].includes(category)) {
       return res.status(400).json({ message: "Invalid category" });
     }
     if (!Array.isArray(skills)) {
