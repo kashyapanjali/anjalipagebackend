@@ -25,6 +25,6 @@ router.get("/admin-dashboard", adminAuth, (req, res) => {
 
 
 // test api
-router.post("/admin/test1",test1);
+// router.post("/admin/test1",test1);
 
 module.exports = router;
