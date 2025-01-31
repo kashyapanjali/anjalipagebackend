@@ -17,7 +17,14 @@ router.get("/portfolio", getPortfolio);
 router.put("/admin/profile-pic", adminAuth, upload.single("profilePic"), updateProfilePic);
 router.post("/admin/skills", adminAuth, addSkills);
 router.post("/admin/certificates", adminAuth, addCertificate);
-router.post("/admin/login",adminAuth)
+
+router.get("/admin-dashboard", adminAuth, (req, res) => {
+  console.log("Received token:", req.headers.authorization);
+  res.json({ message: `Welcome, Admin ${req.user.email}!` });
+});
+
+
+// test api
 router.post("/admin/test1",test1);
 
 module.exports = router;
