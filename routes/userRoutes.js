@@ -7,7 +7,6 @@ const {
   updateProfilePic,
   addCertificate,
   addSkills,
-  test1
 } = require("../controllers/userController");
 
 // **Public Route: Get Portfolio Data (Read-Only)**
@@ -22,9 +21,5 @@ router.get("/admin-dashboard", adminAuth, (req, res) => {
   console.log("Received token:", req.headers.authorization);
   res.json({ message: `Welcome, Admin ${req.user.email}!` });
 });
-
-
-// test api
-// router.post("/admin/test1",test1);
 
 module.exports = router;

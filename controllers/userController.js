@@ -1,5 +1,4 @@
 // Inside userController.js
-const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
@@ -16,7 +15,6 @@ const getPortfolio = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Portfolio not found" });
     }
-
     // Format certificates correctly
     const formattedCertificates = {
       Internship: [],
@@ -29,7 +27,6 @@ const getPortfolio = async (req, res) => {
         formattedCertificates[cert.category].push(cert.link);
       }
     });
-
     res.json({
       profilePic: user.profilePic,
       skills: user.skills,
@@ -40,8 +37,7 @@ const getPortfolio = async (req, res) => {
   }
 };
 
-
-// **Update Profile Picture (Admin Only)**Admin change profile pic
+// Update Profile Picture (Admin Only)Admin change profile pic
 const updateProfilePic = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -59,33 +55,28 @@ const updateProfilePic = async (req, res) => {
       }
       user.profilePic = profilePicUrl;
     }
-
     await user.save();
 
     // Emit real-time update to all connected clients
     ioInstance?.emit("portfolioUpdated", { profilePic: user.profilePic, skills: user.skills, certificates: user.certificates });
-
     res.json({ message: "Profile updated successfully", profilePic: user.profilePic });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 const addCertificate = async (req, res) => {
   try {
     let user = await User.findOne();
     if (!user) user = new User({ skills: {}, certificates: [] });
-
     const { category, link } = req.body;
 
     if (!["Internship", "Course", "Completion"].includes(category)) {
       return res.status(400).json({ message: "Invalid category" });
     }
-
     user.certificates.push({ category, link });
     await user.save();
 
-    // ✅ Ensure correct structure when emitting WebSocket event
+    //Ensure correct structure when emitting WebSocket event
     const formattedCertificates = {
       Internship: [],
       Course: [],
@@ -98,7 +89,7 @@ const addCertificate = async (req, res) => {
       }
     });
 
-    // ✅ Emit updated portfolio data
+    // Emit updated portfolio data
     ioInstance?.emit("portfolioUpdated", {
       profilePic: user.profilePic,
       skills: user.skills,
@@ -110,7 +101,6 @@ const addCertificate = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
-
 
 // **Add Skills (Admin Only)**admin add skills
 const addSkills = async (req, res) => {
