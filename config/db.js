@@ -2,22 +2,19 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,     
-        });
-        console.log(`MongoDB Connected: ${conn.connection.host}`); // Logs the connection host to the console
+        const conn = await mongoose.connect(process.env.MONGO_URI); // Removed deprecated options
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`Error: ${error.message}`);
-        process.exit(1); // Exit the process with a non-zero status to indicate failure
+        process.exit(1);
     }
 };
 
 // Gracefully shutdown MongoDB connection on app termination
 process.on('SIGINT', async () => {
-    await mongoose.connection.close(); // Close the mongoose connection
+    await mongoose.connection.close();
     console.log('MongoDB connection closed');
-    process.exit(0); // Exit the process with a success status
+    process.exit(0);
 });
 
 module.exports = connectDB;
