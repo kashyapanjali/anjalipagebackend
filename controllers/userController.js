@@ -2,6 +2,7 @@
 const path = require("path");
 const fs = require("fs");
 const User = require("../models/User");
+const cloudinary = require("../config/cloudinary");
 let ioInstance;
 
 // Initialize WebSocket
@@ -37,33 +38,35 @@ const getPortfolio = async (req, res) => {
   }
 };
 
-// Update Profile Picture (Admin Only)Admin change profile pic
+
 const updateProfilePic = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    const profilePicUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    // Upload the image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "profile_pictures",  // Store images in the 'profile_pictures' folder
+    });
+
+    const profilePicUrl = result.secure_url;  // Get Cloudinary URL
 
     let user = await User.findOne();
     if (!user) {
       user = new User({ profilePic: profilePicUrl, skills: {}, certificates: [] });
     } else {
-      // Delete old profile pic if exists
-      if (user.profilePic) {
-        const oldPath = path.join(__dirname, "..", "uploads", path.basename(user.profilePic));
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
       user.profilePic = profilePicUrl;
     }
     await user.save();
 
-    // Emit real-time update to all connected clients
+    // Emit real-time update to frontend
     ioInstance?.emit("portfolioUpdated", { profilePic: user.profilePic, skills: user.skills, certificates: user.certificates });
+
     res.json({ message: "Profile updated successfully", profilePic: user.profilePic });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 const addCertificate = async (req, res) => {
   try {
     let user = await User.findOne();
