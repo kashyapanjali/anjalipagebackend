@@ -47,7 +47,7 @@ const updateProfilePic = async (req, res) => {
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "profile_pictures",  // Store images in the 'profile_pictures' folder
     });
-
+    console.log(result);  // Check Cloudinary response in logs
     const profilePicUrl = result.secure_url;  // Get Cloudinary URL
 
     let user = await User.findOne();
