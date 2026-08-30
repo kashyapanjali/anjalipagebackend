@@ -5,15 +5,15 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
 	profilePic: {
 		type: String,
-		required: false, 
+		required: false,
 	},
 
 	skills: {
-		frontend: { type: [String], required: true }, 
-		backend: { type: [String], required: true }, 
-		database: { type: [String], required: true }, 
+		frontend: { type: [String], required: true },
+		backend: { type: [String], required: true },
+		database: { type: [String], required: true },
 		tools: { type: [String], required: true },
-		others:{type: [String], required: true} //how to add this?
+		others: { type: [String], required: true }, //how to add this?
 	},
 
 	certificates: [
@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
 				enum: ["Internship", "Course", "Completion"],
 				required: true,
 			}, // Type of certificate
-			link: { type: String, required: false }, 
+			link: { type: String, required: false },
 		},
 	],
 });

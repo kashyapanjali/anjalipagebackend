@@ -46,7 +46,7 @@ app.use("/api/users", userRoutes);
 // WebSocket connection handling
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
-  
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
