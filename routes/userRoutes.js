@@ -1,27 +1,37 @@
 const express = require("express");
 const router = express.Router();
 const adminAuth = require("../middleware/authMiddleware"); // Ensure this middleware exists
-const upload = require("../middleware/upload");
+const { upload, uploadResume } = require("../middleware/upload");
 const {
-  getPortfolio,
-  updateProfilePic,
-  updateResume,
-  addCertificate,
-  addSkills,
+	getPortfolio,
+	updateProfilePic,
+	updateResume,
+	addCertificate,
+	addSkills,
 } = require("../controllers/userController");
 
 // **Public Route: Get Portfolio Data (Read-Only)**
 router.get("/portfolio", getPortfolio);
 
 // **Admin-Only Routes**
-router.put("/admin/profile-pic", adminAuth, upload.single("profilePic"), updateProfilePic);
-router.put("/admin/resume", adminAuth, upload.single("resume"), updateResume);
+router.put(
+	"/admin/profile-pic",
+	adminAuth,
+	upload.single("profilePic"),
+	updateProfilePic,
+);
+router.put(
+	"/admin/resume",
+	adminAuth,
+	uploadResume.single("resume"),
+	updateResume,
+);
 router.post("/admin/skills", adminAuth, addSkills);
 router.post("/admin/certificates", adminAuth, addCertificate);
 
 router.get("/admin-dashboard", adminAuth, (req, res) => {
-  console.log("Received token:", req.headers.authorization);
-  res.json({ message: `Welcome, Admin ${req.user.email}!` });
+	console.log("Received token:", req.headers.authorization);
+	res.json({ message: `Welcome, Admin ${req.user.email}!` });
 });
 
 module.exports = router;
