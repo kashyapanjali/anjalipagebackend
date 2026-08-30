@@ -5,6 +5,7 @@ const upload = require("../middleware/upload");
 const {
   getPortfolio,
   updateProfilePic,
+  updateResume,
   addCertificate,
   addSkills,
 } = require("../controllers/userController");
@@ -14,6 +15,7 @@ router.get("/portfolio", getPortfolio);
 
 // **Admin-Only Routes**
 router.put("/admin/profile-pic", adminAuth, upload.single("profilePic"), updateProfilePic);
+router.put("/admin/resume", adminAuth, upload.single("resume"), updateResume);
 router.post("/admin/skills", adminAuth, addSkills);
 router.post("/admin/certificates", adminAuth, addCertificate);
 

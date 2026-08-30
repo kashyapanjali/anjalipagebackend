@@ -8,6 +8,11 @@ const UserSchema = new mongoose.Schema({
 		required: false,
 	},
 
+	resume: {
+		type: String,
+		required: false,
+	},
+
 	skills: {
 		frontend: { type: [String], required: true },
 		backend: { type: [String], required: true },

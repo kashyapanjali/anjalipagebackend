@@ -5,10 +5,15 @@ const cloudinary = require("../config/cloudinary");
 // Cloudinary storage setup
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "profile_pictures",
-    format: async (req, file) => "png", // Convert all images to PNG
-    public_id: (req, file) => Date.now() + "-" + file.originalname,
+  params: async (req, file) => {
+    const isResume = file.fieldname === "resume";
+    const filenameWithoutExt = file.originalname.replace(/\.[^/.]+$/, "");
+    return {
+      folder: isResume ? "resumes" : "profile_pictures",
+      resource_type: isResume ? "auto" : "image",
+      format: isResume ? undefined : "png",
+      public_id: `${Date.now()}-${filenameWithoutExt}`,
+    };
   },
 });
 

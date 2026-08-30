@@ -23,13 +23,16 @@ const getPortfolio = async (req, res) => {
       Completion: []
     };
 
-    user.certificates.forEach(cert => {
-      if (formattedCertificates[cert.category]) {
-        formattedCertificates[cert.category].push(cert.link);
-      }
-    });
+    if (user.certificates && Array.isArray(user.certificates)) {
+      user.certificates.forEach(cert => {
+        if (formattedCertificates[cert.category]) {
+          formattedCertificates[cert.category].push(cert.link);
+        }
+      });
+    }
     res.json({
       profilePic: user.profilePic,
+      resume: user.resume,
       skills: user.skills,
       certificates: formattedCertificates, // Ensure correct structure
     });
@@ -43,12 +46,13 @@ const updateProfilePic = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    // Upload the image to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "profile_pictures",  // Store images in the 'profile_pictures' folder
-    });
-    console.log(result);  // Check Cloudinary response in logs
-    const profilePicUrl = result.secure_url;  // Get Cloudinary URL
+    let profilePicUrl = req.file.path || req.file.secure_url;
+    if (profilePicUrl && !profilePicUrl.startsWith("http")) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "profile_pictures",
+      });
+      profilePicUrl = result.secure_url;
+    }
 
     let user = await User.findOne();
     if (!user) {
@@ -59,9 +63,49 @@ const updateProfilePic = async (req, res) => {
     await user.save();
 
     // Emit real-time update to frontend
-    ioInstance?.emit("portfolioUpdated", { profilePic: user.profilePic, skills: user.skills, certificates: user.certificates });
+    ioInstance?.emit("portfolioUpdated", {
+      profilePic: user.profilePic,
+      resume: user.resume,
+      skills: user.skills,
+      certificates: user.certificates
+    });
 
     res.json({ message: "Profile updated successfully", profilePic: user.profilePic });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateResume = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+    let resumeUrl = req.file.path || req.file.secure_url;
+    if (resumeUrl && !resumeUrl.startsWith("http")) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "resumes",
+        resource_type: "auto",
+      });
+      resumeUrl = result.secure_url;
+    }
+
+    let user = await User.findOne();
+    if (!user) {
+      user = new User({ resume: resumeUrl, skills: {}, certificates: [] });
+    } else {
+      user.resume = resumeUrl;
+    }
+    await user.save();
+
+    // Emit real-time update to frontend
+    ioInstance?.emit("portfolioUpdated", {
+      profilePic: user.profilePic,
+      resume: user.resume,
+      skills: user.skills,
+      certificates: user.certificates
+    });
+
+    res.json({ message: "Resume updated successfully", resume: user.resume });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -95,6 +139,7 @@ const addCertificate = async (req, res) => {
     // Emit updated portfolio data
     ioInstance?.emit("portfolioUpdated", {
       profilePic: user.profilePic,
+      resume: user.resume,
       skills: user.skills,
       certificates: formattedCertificates
     });
@@ -124,7 +169,12 @@ const addSkills = async (req, res) => {
     await user.save();
 
     // Emit real-time updates
-    ioInstance?.emit("portfolioUpdated", { profilePic: user.profilePic, skills: user.skills, certificates: user.certificates });
+    ioInstance?.emit("portfolioUpdated", {
+      profilePic: user.profilePic,
+      resume: user.resume,
+      skills: user.skills,
+      certificates: user.certificates
+    });
 
     res.json({ message: "Skills added successfully" });
   } catch (error) {
@@ -136,6 +186,7 @@ module.exports = {
   initializeSocket,
   getPortfolio,
   updateProfilePic,
+  updateResume,
   addCertificate,
   addSkills,
 };
