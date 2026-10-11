@@ -86,11 +86,25 @@ const updateResume = async (req, res) => {
 	try {
 		if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-		// Local static URL served via Express static (/uploads/resumes/filename.pdf)
-		const protocol = req.protocol;
-		const host = req.get("host");
-		const relativePath = `/uploads/resumes/${req.file.filename}`;
-		const resumeUrl = `${protocol}://${host}${relativePath}`;
+		let resumeUrl;
+		if (process.env.CLOUDINARY_CLOUD_NAME) {
+			try {
+				const result = await cloudinary.uploader.upload(req.file.path, {
+					folder: "resumes",
+					resource_type: "auto",
+				});
+				resumeUrl = result.secure_url;
+			} catch (cloudErr) {
+				console.error("Cloudinary resume upload failed, falling back to local:", cloudErr);
+				const protocol = req.protocol;
+				const host = req.get("host");
+				resumeUrl = `${protocol}://${host}/uploads/resumes/${req.file.filename}`;
+			}
+		} else {
+			const protocol = req.protocol;
+			const host = req.get("host");
+			resumeUrl = `${protocol}://${host}/uploads/resumes/${req.file.filename}`;
+		}
 
 		let user = await User.findOne();
 		if (!user) {
