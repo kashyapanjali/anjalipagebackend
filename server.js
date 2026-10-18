@@ -44,6 +44,11 @@ initializeSocket(io);
 // Use routes
 app.use("/api/users", userRoutes);
 
+// Root route / Health check
+app.get("/", (req, res) => {
+	res.send("Backend server is running smoothly!");
+});
+
 // WebSocket connection handling
 io.on("connection", (socket) => {
 	console.log("New user connected:", socket.id);
